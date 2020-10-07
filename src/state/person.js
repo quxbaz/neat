@@ -19,10 +19,11 @@ const person = (state, setState, action) => {
       age: 0,
     })
   }
+  const {name, age} = action.payload
   if (action.type === 'person/SET_NAME') {
-    state.name += action.payload.name
+    state.name = name
   } else if (action.type === 'person/SET_AGE') {
-    state.age += action.payload.age
+    state.age = age
   }
 }
 

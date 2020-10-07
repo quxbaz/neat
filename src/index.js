@@ -1,25 +1,21 @@
-import {values, keys} from './util'
+import combineMutators from './combineMutators'
 import createStore from './createStore'
 import {setVersion, version} from './state/version'
 import {setAge, setName, person} from './state/person'
+import {
+  create as createTodo,
+  remove as removeTodo,
+  update as updateTodo,
+  todos,
+} from './state/todos'
 
-const combineMutators = (state, mutators) => {
-  return (state, action) => {
-    keys(mutators).forEach((key) => {
-      const setState = (value) => state[key] = value
-      mutators[key](state[key], setState, action)
-    })
-  }
-}
-
-const appState = {}
-
-const baseMutator = combineMutators(appState, {
+const baseMutator = combineMutators({
   version,
   person,
+  todos,
 })
 
-const store = createStore(appState, baseMutator)
+const store = createStore(baseMutator)
 
 store.subscribe((state, action) => {
   if (action.type === '@@INIT') {
@@ -28,14 +24,17 @@ store.subscribe((state, action) => {
   console.log(state)
 })
 
-/*
-  Trigger store state initialization in mutator functions.
-*/
-store.dispatch({
-  type: '@@INIT',
-  payload: {},
-})
-
 store.dispatch(setVersion('0.0.1'))
 store.dispatch(setName('Bob'))
 store.dispatch(setAge(21))
+store.dispatch(setAge(21))
+
+store.dispatch(createTodo('Buy milk.'))
+store.dispatch(createTodo('Get gas.'))
+store.dispatch(createTodo('Clean bathroom.'))
+
+const action = createTodo('Cook dinner.')
+const {id} = action.payload
+store.dispatch(action)
+store.dispatch(updateTodo(id, 'Cook big dinner.'))
+store.dispatch(removeTodo(id))
