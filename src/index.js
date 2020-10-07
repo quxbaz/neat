@@ -1,28 +1,23 @@
-import combineMutators from './combineMutators'
-import createStore from './createStore'
-import {setVersion, version} from './state/version'
-import {setAge, setName, person} from './state/person'
+/*
+  State
+*/
+import {setVersion} from './state/version'
+import {setAge, setName} from './state/person'
 import {
   create as createTodo,
   remove as removeTodo,
   update as updateTodo,
-  todos,
 } from './state/todos'
 
-const baseMutator = combineMutators({
-  version,
-  person,
-  todos,
-})
+import createApp from './createApp'
 
-const store = createStore(baseMutator)
+/*
+  Components
+*/
+import App from './components/App'
 
-store.subscribe((state, action) => {
-  if (action.type === '@@INIT') {
-    return
-  }
-  console.log(state)
-})
+const app = createApp()
+const {store} = app
 
 store.dispatch(setVersion('0.0.1'))
 store.dispatch(setName('Bob'))
@@ -38,3 +33,14 @@ const {id} = action.payload
 store.dispatch(action)
 store.dispatch(updateTodo(id, 'Cook big dinner.'))
 store.dispatch(removeTodo(id))
+
+const render = (component, root) => {
+  root.appendChild(component)
+}
+
+// const {state, dispatch} = store
+
+render(
+  App(store).dom,
+  document.body
+)
